@@ -1,0 +1,51 @@
+{
+  "name": "lens-llm-extension",
+  "version": "0.0.1",
+  "description": "LLM for Lens",
+  "homepage": "https://github.com/chenhunghan/lens-llm-extension",
+  "main": "dist/main.js",
+  "renderer": "dist/renderer.js",
+  "storeName": "lens-llm-extension",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chenhunghan/lens-llm-extension"
+  },
+  "bugs": {
+    "url": "https://github.com/chenhunghan/lens-llm-extension/issues"
+  },
+  "engines": {
+    "lens": "^6.0.0"
+  },
+  "scripts": {
+    "start": "webpack --watch",
+    "build": "npm run clean && npm run webpack && npm pack",
+    "webpack": "webpack",
+    "clean": "rm -rf ./dist && rm *.tgz || true"
+  },
+  "files": [
+    "bin/*",
+    "dist/**/*"
+  ],
+  "devDependencies": {
+    "@k8slens/extensions": "6.2.5",
+    "@react-llm/headless": "^0.0.5",
+    "@react-llm/model": "^0.0.5",
+    "@swc/cli": "0.1.62",
+    "@swc/core": "1.2.198",
+    "@swc/jest": "0.2.24",
+    "@types/node": "16.11.26",
+    "@types/react": "17.0.45",
+    "@wasmer/wasi": "^1.2.2",
+    "electron": "19.0.4",
+    "mobx": "6.5.0",
+    "mobx-react": "7.5.0",
+    "mobx-utils": "6.0.5",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "swc-loader": "0.2.3",
+    "ts-loader": "8.4.0",
+    "typescript": "4.7.4",
+    "webpack": "5.74.0",
+    "webpack-cli": "4.10.0"
+  }
+}
