@@ -1,6 +1,5 @@
-
 import { Renderer } from "@k8slens/extensions";
-import type { InstalledExtension } from "@k8slens/extensions/dist/src/extensions/extension-discovery/extension-discovery"
+import type { InstalledExtension } from "@k8slens/extensions/dist/src/extensions/extension-discovery/extension-discovery";
 import { LLM } from "./src/renderer/LLM";
 
 export default class LensLLMExtensionRenderer extends Renderer.LensExtension {
@@ -15,10 +14,10 @@ export default class LensLLMExtensionRenderer extends Renderer.LensExtension {
       {
         components: {
           Item: () => {
-            return <LLM />
+            return <LLM />;
           },
         },
       },
-    ]
+    ];
   }
 }

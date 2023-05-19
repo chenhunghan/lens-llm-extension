@@ -1,15 +1,25 @@
 import { detectGPUDevice, instantiate } from "../tvm";
 import { InitProgressCallback } from "../tvm/runtime";
-import { Conversation, GenerateTextCallback, GenerateTextRequest, ModelInitConfig } from "../types/modelApi";
+import {
+  Conversation,
+  GenerateTextCallback,
+  GenerateTextRequest,
+  ModelInitConfig,
+} from "../types/modelApi";
 import crypto from "crypto";
 import { init, WASI } from "@wasmer/wasi";
 
 export class LLMInstance {
   config: ModelInitConfig;
+
   tvm: any;
+
   tokenizer: any;
+
   model: any;
+
   spp: any;
+
   processing: boolean;
 
   constructor(config: ModelInitConfig, sentencePieceProcessor: any) {
@@ -30,21 +40,24 @@ export class LLMInstance {
       return;
     }
     const wasmSource = await (await fetch(this.config.wasmUrl)).arrayBuffer();
+
     await init();
     this.tvm = await instantiate(
       new Uint8Array(wasmSource),
       new WASI({}),
-      console.log,
+      console.log
     );
+
     try {
       const output = await detectGPUDevice();
+
       if (output !== undefined) {
         this.tvm.initWebGPU(output.device);
       } else {
         throw Error("This browser env do not support WebGPU");
       }
     } catch (err: any) {
-      throw Error("Find an error initializing WebGPU: " + err.toString());
+      throw Error(`Find an error initializing WebGPU: ${err.toString()}`);
     }
     this.tvm.registerInitProgressCallback(cb);
     await this.tvm.fetchNDArrayCache(this.config.cacheUrl, this.tvm.webgpu());
@@ -57,10 +70,14 @@ export class LLMInstance {
         this.config.maxWindowSize
       );
     });
+
     return this.model.init();
   }
 
-  async generate(request: GenerateTextRequest, cb: GenerateTextCallback = console.log) {
+  async generate(
+    request: GenerateTextRequest,
+    cb: GenerateTextCallback = console.log
+  ) {
     if (this.processing) {
       return;
     }
@@ -72,20 +89,35 @@ export class LLMInstance {
 
 export class LLMInstanceScope {
   tvm: any;
+
   tokenizer: any;
+
   maxWindowSize: number;
+
   device: any;
+
   vm: any;
+
   encoding: any;
+
   decoding: any;
+
   params: any;
+
   bosTokenId: number;
+
   eosTokenId: number;
+
   fclearKVCaches: any;
+
   kvCache: any;
+
   fcreateCache: any;
+
   logitsOnCPU: any;
+
   kvCacheLength: number;
+
   lastMessageId: string;
 
   constructor(tvm: any, tokenizer: any, maxWindowSize = 2048) {
@@ -112,6 +144,7 @@ export class LLMInstanceScope {
       this.tvm.getParamsFromCache("param", this.tvm.cacheMetadata.ParamSize)
     );
     const fcreateCache = this.vm.getFunction("create_kv_cache");
+
     this.fclearKVCaches = this.tvm.detachFromCurrentScope(
       this.tvm.getGlobalFunc("vm.builtin.attention_kv_cache_array_clear")
     );
@@ -137,6 +170,7 @@ export class LLMInstanceScope {
       const message = conversation.messages[i];
       const text = `${message.role}: ${message.text}\n`;
       const messageTokens = await this.tokenizer.encodeIds(text);
+
       if (
         tokens.length + messageTokens.length + maxTokens >
         this.maxWindowSize
@@ -160,11 +194,12 @@ export class LLMInstanceScope {
     // Case 4. Attention Cache is not empty, and the last message we processed is in the cache, but the cache is too long, start from beginning
     if (this.kvCacheLength == 0) {
       // Case 1
-      return await this.getTokensFromStart(conversation, maxTokens);
+      return this.getTokensFromStart(conversation, maxTokens);
     }
 
     // Calculate the index of the last message we processed
     let startMsgIdx = 0;
+
     for (let i = conversation.messages.length - 1; i >= 0; i--) {
       if (conversation.messages[i].id == this.lastMessageId) {
         startMsgIdx = i + 1;
@@ -174,20 +209,22 @@ export class LLMInstanceScope {
 
     if (startMsgIdx == 0) {
       // Case 2
-      return await this.getTokensFromStart(conversation, maxTokens);
+      return this.getTokensFromStart(conversation, maxTokens);
     }
 
     const tokens = [this.eosTokenId];
+
     for (let i = startMsgIdx; i < conversation.messages.length; i++) {
       const message = conversation.messages[i];
       const text = `${message.role}: ${message.text}`;
       const messageTokens = await this.tokenizer.encodeIds(text);
+
       if (
         tokens.length + messageTokens.length + maxTokens >
         this.maxWindowSize
       ) {
         // Case 4
-        return await this.getTokensFromStart(conversation, maxTokens);
+        return this.getTokensFromStart(conversation, maxTokens);
       }
       tokens.push(...(await this.tokenizer.encodeIds(text)));
     }
@@ -197,21 +234,32 @@ export class LLMInstanceScope {
   }
 
   async generate(request: GenerateTextRequest, cb: GenerateTextCallback) {
-    const { conversation, maxTokens, assistantRoleName, stopTexts, temperature, top_p } = request;
+    const {
+      conversation,
+      maxTokens,
+      assistantRoleName,
+      stopTexts,
+      temperature,
+      top_p,
+    } = request;
     const tokens = await this.getTokens(conversation, maxTokens);
+
     tokens.push(...(await this.tokenizer.encodeIds(`${assistantRoleName}:`)));
     console.log("debug: ", await this.tokenizer.decodeIds(tokens));
 
     const inputTokenLength = tokens.length;
     let outputText = "";
     let tstart = 0,
-      tend = 0, step = 0;
+      tend = 0,
+      step = 0;
 
     const id = crypto.randomUUID();
+
     for (; step < maxTokens; step++) {
       this.tvm.beginScope();
       tstart = performance.now();
       var input;
+
       if (step == 0) {
         input = this.tvm.empty([1, tokens.length], "int32", this.device);
         input.copyFrom(tokens);
@@ -222,21 +270,33 @@ export class LLMInstanceScope {
       const logits = this.tvm.detachFromCurrentScope(
         this.forward(input, this.kvCacheLength + inputTokenLength + step)
       );
+
       this.tvm.endScope();
-      const nextToken = await this.sampleTokenFromLogits(logits,temperature, top_p);
+      const nextToken = await this.sampleTokenFromLogits(
+        logits,
+        temperature,
+        top_p
+      );
+
       logits.dispose();
 
       tokens.push(nextToken);
       const outputTokens = tokens.slice(inputTokenLength);
+
       outputText = this.tokenizer.decodeIds(outputTokens);
       tend = performance.now();
-      if (nextToken == this.eosTokenId) break;
+
+      if (nextToken == this.eosTokenId) {
+        break;
+      }
       const stopPos = outputText.lastIndexOf("</s>");
+
       if (stopPos != -1) {
         outputText = outputText.substring(0, stopPos);
         break;
       }
       let stop = false;
+
       for (let i = 0; i < stopTexts.length; i++) {
         if (outputText.endsWith(stopTexts[i])) {
           outputText = outputText.substring(
@@ -247,11 +307,15 @@ export class LLMInstanceScope {
           break;
         }
       }
-      if (stop) break;
+
+      if (stop) {
+        break;
+      }
+
       if (step != 0) {
         cb({
           requestId: id,
-          step: step,
+          step,
           outputText,
           stats: {
             totalDecodingSeconds: (tend - tstart) / 1000,
@@ -268,7 +332,7 @@ export class LLMInstanceScope {
     cb({
       requestId: id,
       outputText,
-      step: step,
+      step,
       stats: {
         totalDecodingSeconds: (tend - tstart) / 1000,
         totalDecodedTokens: tokens.length - inputTokenLength,
@@ -286,6 +350,7 @@ export class LLMInstanceScope {
     this.vm.dispose();
     this.kvCache.dispose();
     this.fclearKVCaches.dispose();
+
     if (this.logitsOnCPU != undefined) {
       this.logitsOnCPU.dispose();
     }
@@ -299,16 +364,19 @@ export class LLMInstanceScope {
 
   forward(inputs: any, curPos: number) {
     this.tvm.beginScope();
-    var retValue;
+    let retValue;
     const seqLenShape = this.tvm.makeShapeTuple([curPos]);
+
     if (inputs.shape[1] > 1) {
       retValue = this.encoding(inputs, seqLenShape, this.kvCache, this.params);
     } else {
       retValue = this.decoding(inputs, seqLenShape, this.kvCache, this.params);
     }
     const logits = this.tvm.detachFromCurrentScope(retValue.get(0));
+
     this.tvm.endScope();
     this.tvm.attachToCurrentScope(logits);
+
     return logits;
   }
 
@@ -331,6 +399,7 @@ export class LLMInstanceScope {
     this.updateLogitsOnCPU(logits);
     this.tvm.endScope();
     await this.device.sync();
+
     return this.tvm.sampleTopPFromLogits(this.logitsOnCPU, temperature, top_p);
   }
 }

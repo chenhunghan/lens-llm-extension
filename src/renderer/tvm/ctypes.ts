@@ -40,7 +40,11 @@ export type FTVMGetLastError = () => Pointer;
  *                       TVMFunctionHandle *out);
  */
 export type FTVMModGetFunction = (
-  mod: Pointer, funcName: Pointer, queryImports: number, out: Pointer) => number;
+  mod: Pointer,
+  funcName: Pointer,
+  queryImports: number,
+  out: Pointer
+) => number;
 /**
  * int TVMModImport(TVMModuleHandle mod,
  *                  TVMModuleHandle dep);
@@ -66,8 +70,13 @@ export type FTVMFuncFree = (func: Pointer) => number;
  *                 int* ret_type_code);
  */
 export type FTVMFuncCall = (
-  func: Pointer, argValues: Pointer, typeCode: Pointer,
-  nargs: number, retValue: Pointer, retCode: Pointer) => number;
+  func: Pointer,
+  argValues: Pointer,
+  typeCode: Pointer,
+  nargs: number,
+  retValue: Pointer,
+  retCode: Pointer
+) => number;
 
 /**
  * int TVMCFuncSetReturn(TVMRetValueHandle ret,
@@ -76,7 +85,11 @@ export type FTVMFuncCall = (
  *                       int num_ret);
  */
 export type FTVMCFuncSetReturn = (
-  ret: Pointer, value: Pointer, typeCode: Pointer, numRet: number) => number;
+  ret: Pointer,
+  value: Pointer,
+  typeCode: Pointer,
+  numRet: number
+) => number;
 
 /**
  * int TVMCbArgToReturn(TVMValue* value, int* code);
@@ -86,18 +99,24 @@ export type FTVMCbArgToReturn = (value: Pointer, code: Pointer) => number;
 /**
  * int TVMFuncListGlobalNames(int* outSize, const char*** outArray);
  */
-export type FTVMFuncListGlobalNames = (outSize: Pointer, outArray: Pointer) => number;
+export type FTVMFuncListGlobalNames = (
+  outSize: Pointer,
+  outArray: Pointer
+) => number;
 
 /**
  * int TVMFuncRegisterGlobal(
  *    const char* name, TVMFunctionHandle f, int override);
  */
 export type FTVMFuncRegisterGlobal = (
-  name: Pointer, f: Pointer, override: number) => number;
+  name: Pointer,
+  f: Pointer,
+  override: number
+) => number;
 
 /**
  *int TVMFuncGetGlobal(const char* name, TVMFunctionHandle* out);
-    */
+ */
 export type FTVMFuncGetGlobal = (name: Pointer, out: Pointer) => number;
 
 /**
@@ -111,10 +130,15 @@ export type FTVMFuncGetGlobal = (name: Pointer, out: Pointer) => number;
  *                   TVMArrayHandle* out);
  */
 export type FTVMArrayAlloc = (
-  shape: Pointer, ndim: number,
-  dtypeCode: number, dtypeBits: number,
-  dtypeLanes: number, deviceType: number, deviceId: number,
-  out: Pointer) => number;
+  shape: Pointer,
+  ndim: number,
+  dtypeCode: number,
+  dtypeBits: number,
+  dtypeLanes: number,
+  deviceType: number,
+  deviceId: number,
+  out: Pointer
+) => number;
 
 /**
  * int TVMArrayFree(TVMArrayHandle handle);
@@ -127,7 +151,10 @@ export type FTVMArrayFree = (handle: Pointer) => number;
  *                           size_t nbytes);
  */
 export type FTVMArrayCopyFromBytes = (
-  handle: Pointer, data: Pointer, nbytes: number) => number;
+  handle: Pointer,
+  data: Pointer,
+  nbytes: number
+) => number;
 
 /**
  * int TVMArrayCopyToBytes(TVMArrayHandle handle,
@@ -135,7 +162,10 @@ export type FTVMArrayCopyFromBytes = (
  *                         size_t nbytes);
  */
 export type FTVMArrayCopyToBytes = (
-  handle: Pointer, data: Pointer, nbytes: number) => number;
+  handle: Pointer,
+  data: Pointer,
+  nbytes: number
+) => number;
 
 /**
  * int TVMArrayCopyFromTo(TVMArrayHandle from,
@@ -143,13 +173,19 @@ export type FTVMArrayCopyToBytes = (
  *                        TVMStreamHandle stream);
  */
 export type FTVMArrayCopyFromTo = (
-  from: Pointer, to: Pointer, stream: Pointer) => number;
+  from: Pointer,
+  to: Pointer,
+  stream: Pointer
+) => number;
 
 /**
  * int TVMSynchronize(int device_type, int device_id, TVMStreamHandle stream);
  */
 export type FTVMSynchronize = (
-  deviceType: number, deviceId: number, stream: Pointer) => number;
+  deviceType: number,
+  deviceId: number,
+  stream: Pointer
+) => number;
 
 /**
  * typedef int (*TVMBackendPackedCFunc)(TVMValue* args,
@@ -159,29 +195,41 @@ export type FTVMSynchronize = (
  *                                      int* out_ret_tcode);
  */
 export type FTVMBackendPackedCFunc = (
-  argValues: Pointer, argCodes: Pointer, nargs: number,
-  outValue: Pointer, outCode: Pointer) => number;
-
+  argValues: Pointer,
+  argCodes: Pointer,
+  nargs: number,
+  outValue: Pointer,
+  outCode: Pointer
+) => number;
 
 /**
  * int TVMObjectFree(TVMObjectHandle obj);
  */
- export type FTVMObjectFree = (obj: Pointer) => number;
+export type FTVMObjectFree = (obj: Pointer) => number;
 
 /**
  * int TVMObjectGetTypeIndex(TVMObjectHandle obj, unsigned* out_tindex);
  */
-export type FTVMObjectGetTypeIndex = (obj: Pointer, out_tindex: Pointer) => number;
+export type FTVMObjectGetTypeIndex = (
+  obj: Pointer,
+  out_tindex: Pointer
+) => number;
 
 /**
  * int TVMObjectTypeIndex2Key(unsigned tindex, char** out_type_key);
  */
-export type FTVMObjectTypeIndex2Key = (type_index: number, out_type_key: Pointer) => number;
+export type FTVMObjectTypeIndex2Key = (
+  type_index: number,
+  out_type_key: Pointer
+) => number;
 
 /**
  * int TVMObjectTypeKey2Index(const char* type_key, unsigned* out_tindex);
  */
-export type FTVMObjectTypeKey2Index = (type_key: Pointer, out_tindex: Pointer) => number;
+export type FTVMObjectTypeKey2Index = (
+  type_key: Pointer,
+  out_tindex: Pointer
+) => number;
 
 // -- TVM Wasm Auxiliary C API --
 
@@ -199,15 +247,21 @@ export type FTVMWasmFreeSpace = (ptr: Pointer) => void;
  *                        void* resource_handle);
  */
 export type FTVMWasmPackedCFunc = (
-  args: Pointer, typeCodes: Pointer, nargs: number,
-  ret: Pointer, resourceHandle: Pointer) => number;
+  args: Pointer,
+  typeCodes: Pointer,
+  nargs: number,
+  ret: Pointer,
+  resourceHandle: Pointer
+) => number;
 
 /**
  * int TVMWasmFuncCreateFromCFunc(void* resource_handle,
  *                                TVMFunctionHandle *out);
  */
 export type FTVMWasmFuncCreateFromCFunc = (
-  resource: Pointer, out: Pointer) => number;
+  resource: Pointer,
+  out: Pointer
+) => number;
 
 /**
  * void TVMWasmPackedCFuncFinalizer(void* resource_handle);
@@ -247,5 +301,5 @@ export const enum ArgTypeCode {
   TVMStr = 11,
   TVMBytes = 12,
   TVMNDArrayHandle = 13,
-  TVMObjectRValueRefArg = 14
+  TVMObjectRValueRefArg = 14,
 }
