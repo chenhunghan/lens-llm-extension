@@ -27,6 +27,7 @@
     "dist/**/*"
   ],
   "devDependencies": {
+    "@k8slens/eslint-config": "^6.5.0-alpha.1",
     "@k8slens/extensions": "6.2.5",
     "@react-llm/headless": "^0.0.5",
     "@react-llm/model": "^0.0.5",
@@ -37,6 +38,7 @@
     "@types/react": "17.0.45",
     "@wasmer/wasi": "^1.2.2",
     "electron": "19.0.4",
+    "eslint": "^8.40.0",
     "mobx": "6.5.0",
     "mobx-react": "7.5.0",
     "mobx-utils": "6.0.5",
